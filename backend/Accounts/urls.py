@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from Accounts.views import AccountView, UpdateView, LoginView, DeleteAccountView, LogOutView, getAccountView, \
-    get_user_session, UpdateSessionToken
+    get_user_session
 
 from django.urls import path
 
@@ -18,7 +18,6 @@ urlpatterns = [
     path('logout/', LogOutView.as_view()),
     path('<int:id>/user/', getAccountView.as_view()),
     path('session/', get_user_session),
-    path('session/update_token/', UpdateSessionToken.as_view())
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

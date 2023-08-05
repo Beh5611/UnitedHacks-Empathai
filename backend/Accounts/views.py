@@ -5,6 +5,9 @@ from rest_framework.generics import RetrieveAPIView, CreateAPIView, UpdateAPIVie
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import HttpResponseNotFound, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 
 from Accounts.models import UserProfile
 from Accounts.serializers import UpdateSerializer, UserSerializer
@@ -44,14 +47,11 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)
-            tokens = create_jwt_pair_for_user(user)
-            response = {"message": "Login Successful", "tokens": tokens}
+            
+            response = {"message": "Login Successful"}
             userdata = UserSerializer(user).data
             request.session['user'] = userdata
-            request.session['tokens'] = tokens
-            if not remember_me:
-                print("session expiry set to 0")
-                request.session.set_expiry(0)
+        
             return Response(data=response, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -94,18 +94,14 @@ class DeleteAccountView(APIView):
 #         return UserProfile.objects.all()
 
 
+# @method_decorator(csrf_exempt, name='dispatch')
 class LogOutView(APIView):
-
     def post(self, request):
-        response = Response("Successfully logout")
         if self.request.user.is_authenticated:
-            try:
-                del request.session['user']
-                del request.session['tokens']
-                logout(request)
-            except Exception:
-                return Response("Logout Failed")
-        return response
+            logout(request)
+            return Response("Successfully logged out.")
+        else:
+            return Response("You are not logged in.")
 
 
 class getAccountView(RetrieveAPIView):
@@ -118,16 +114,16 @@ class getAccountView(RetrieveAPIView):
 
 def get_user_session(request):
     user = request.session.get('user')
-    tokens = request.session.get('tokens')
-    if user and tokens:
-        return JsonResponse({"user": user, "tokens": tokens})
+
+    if user:
+        return JsonResponse({"user": user})
     return HttpResponseNotFound()
 
 
-class UpdateSessionToken(APIView):
-    def post(self, request):
-        tokens = request.data.get('tokens', None)
-        if tokens:
-            request.session['tokens'] = tokens
-            return Response("Successfully updated token")
-        return HttpResponseNotFound("No token provided")
+# class UpdateSessionToken(APIView):
+#     def post(self, request):
+#         tokens = request.data.get('tokens', None)
+#         if tokens:
+#             request.session['tokens'] = tokens
+#             return Response("Successfully updated token")
+#         return HttpResponseNotFound("No token provided")
