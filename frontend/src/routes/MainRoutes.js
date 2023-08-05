@@ -6,10 +6,9 @@ import MainLayout from 'layout/MainLayout';
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
+const ChatBot = Loadable(lazy(() => import('pages/Chat')));
+const Meditate = Loadable(lazy(() => import('pages/Meditation')));
 
-
-const Color = Loadable(lazy(() => import('pages/components-overview/Color')));
-const AntIcons = Loadable(lazy(() => import('pages/components-overview/AntIcons')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -22,10 +21,6 @@ const MainRoutes = {
       element: <DashboardDefault />
     },
     {
-      path: 'color',
-      element: <Color />
-    },
-    {
       path: 'dashboard',
       children: [
         {
@@ -35,8 +30,12 @@ const MainRoutes = {
       ]
     },
     {
-      path: 'icons/ant',
-      element: <AntIcons />
+      path: 'chat',
+      element: <ChatBot />
+    },
+    {
+      path: 'meditate',
+      element: <Meditate />
     }
   ]
 };
