@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
 import useSound from "use-sound";
-import qala from "../../assets/music/binural.mp3";
+import binural from "../../assets/music/binural.mp3";
+import rain from "../../assets/music/rain.mp3";
+import river from "../../assets/music/river.mp3";
 import { AiFillPlayCircle, AiFillPauseCircle } from "react-icons/ai";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { IconContext } from "react-icons";
 import { Card, Typography, Stack, CardMedia, Box, Grid, Button } from '@mui/material';
 
 export default function Player() {
+  const playlist = [
+    binural,
+    rain,
+    river
+  ]
+  const titles = [
+    'Theraputic Ambiance',
+    'Calming Rain',
+    'Peace by the River'
+  ]
+  const [songNum, setSongNum] = useState(1)
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState({
     min: "",
@@ -19,7 +32,7 @@ export default function Player() {
 
   const [seconds, setSeconds] = useState(0);
 
-  const [play, { pause, duration, sound}] = useSound(qala);
+  const [play, { pause, duration, sound}] = useSound(playlist[songNum - 1]);
 
   useEffect(() => {
     if (duration) {
@@ -48,6 +61,18 @@ export default function Player() {
     return () => clearInterval(interval);
   }, [sound]);
 
+  const handleNextSong = () => {
+    if (songNum < playlist.length){
+      setSongNum(songNum + 1);
+    } else{
+      setSongNum(1);
+    }
+  }
+  const handlePreviousSong = () => {
+    if (songNum > 1){
+      setSongNum(songNum - 1);
+    } 
+  }
   const playingButton = () => {
     if (isPlaying) {
       pause();
@@ -59,12 +84,14 @@ export default function Player() {
   };
 
   const skipNext = () => {
+    handleNextSong();
     if (sound && sound.seek) {
       sound.seek(duration/1000)
     }
   };
 
   const skipPrevious = () => {
+    handlePreviousSong();
     if (sound && sound.seek) {
       sound.seek(0)
   }
@@ -80,16 +107,13 @@ export default function Player() {
           <CardMedia
             component="img"
             height= '250'
-            image="https://picsum.photos/200/200" 
+            image="https://source.unsplash.com/random" 
             alt="img"
             sx={{width: '300px', borderRadius: '10px'}}
           />
         </Box>
         <Box  sx={{display: 'flex', justifyContent: 'center'}}>
-          <Typography variant='h4'>Title</Typography>
-        </Box>
-        <Box  sx={{display: 'flex', justifyContent: 'center'}}>
-          <Typography>Artist</Typography>
+          <Typography variant='h4'>{titles[songNum - 1]}</Typography>
         </Box>
         <Box  sx={{display: 'flex', justifyContent: 'center'}}>
           <Grid container sx={{display: 'flex', justifyContent: 'center'}}>
