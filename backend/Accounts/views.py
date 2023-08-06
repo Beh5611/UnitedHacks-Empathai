@@ -47,14 +47,15 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)
-            
+
             response = {"message": "Login Successful"}
             userdata = UserSerializer(user).data
             request.session['user'] = userdata
+            print('userid in Accounts', self.request.user.id)
             # if not remember_me:
             #     print("session expiry set to 0")
             #     request.session.set_expiry(0)
-        
+
             return Response(data=response, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
