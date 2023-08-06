@@ -54,7 +54,7 @@ const MonthlyBarChart = () => {
       data: [80, 95, 70, 42, 65, 55, 78]
     }
   ]);
-
+  
   const [options, setOptions] = useState(barChartOptions);
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
+import axios from "axios"
 
 // chart options
 const areaChartOptions = {
@@ -37,6 +38,27 @@ const IncomeAreaChart = ({ slot }) => {
   const line = theme.palette.divider;
 
   const [options, setOptions] = useState(areaChartOptions);
+  const [dailyMood, setDailyMood] = useState([1, 4, 7, 5, 6, 7, 0]);
+
+
+  const fetchMood = async () => {
+    await axios
+      .get("http://127.0.0.1:8000/moods/all/", { withCredentials: true })
+      .then(async function (response) {
+        
+        // const dateObject = new Date(response.data[0].date);
+        let v = dailyMood;
+        v[6] = response.data[0].score
+        setDailyMood(v);
+      })
+      .catch(async function (error) {
+        console.log(error);
+      });
+  };
+  fetchMood();
+
+
+
 
   useEffect(() => {
     setOptions((prevState) => ({
@@ -88,10 +110,7 @@ const IncomeAreaChart = ({ slot }) => {
   }, [primary, secondary, line, theme, slot]);
 
   const [series, setSeries] = useState([
-    {
-      name: 'Page Views',
-      data: [0, 86, 28, 115, 48, 210, 136]
-    },
+
     {
       name: 'Sessions',
       data: [0, 43, 14, 56, 24, 105, 68]
@@ -101,12 +120,8 @@ const IncomeAreaChart = ({ slot }) => {
   useEffect(() => {
     setSeries([
       {
-        name: 'Page Views',
-        data: slot === 'month' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35] : [31, 40, 28, 51, 42, 109, 100]
-      },
-      {
         name: 'Sessions',
-        data: slot === 'month' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
+        data: slot === 'month' ? [110, 60, 150, 35, 60, 36, 26, 45 + dailyMood[0], 0, 0, 0, 0] : dailyMood
       }
     ]);
   }, [slot]);
