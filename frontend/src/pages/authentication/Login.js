@@ -2,14 +2,22 @@ import { Link } from 'react-router-dom';
 
 // material-ui
 import { Grid, Stack, Typography } from '@mui/material';
-
+import Cookies from 'js-cookie';
 // project import
 import AuthLogin from './auth-forms/AuthLogin';
 import AuthWrapper from './AuthWrapper';
 
 // ================================|| LOGIN ||================================ //
 
-const Login = () => (
+const Login = () => {
+
+  if(Cookies.get("cookies") ){
+    window.location.href = "http://localhost:3000"
+    return 
+  }
+
+  return (
+  
   <AuthWrapper>
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -25,6 +33,6 @@ const Login = () => (
       </Grid>
     </Grid>
   </AuthWrapper>
-);
+)};
 
 export default Login;
