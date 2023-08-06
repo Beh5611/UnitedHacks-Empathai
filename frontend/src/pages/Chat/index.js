@@ -9,19 +9,25 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
-const messages = [
-  { id: 1, text: "Hi there!", sender: "bot" },
-  { id: 2, text: "Hello!", sender: "user" },
-  { id: 3, text: "How can I assist you today?", sender: "bot" },
-];
-
 const ChatUI = () => {
   const [input, setInput] = React.useState("");
-
+  const [isTyping, setIsTyping] = React.useState(false);
+  const [messages, setMessages] = React.useState(
+    [
+      { id: 1, text: "Hi there!", sender: "bot" },
+      { id: 3, text: "How can I assist you today?", sender: "bot" },
+    ]
+  )
+  console.log('start', isTyping);
   const handleSend = () => {
     if (input.trim() !== "") {
-      messages.push({id: messages.length, text: input, sender: 'user'})
+      console.log("messages before", messages);
+      const updatedMessages = [...messages, { id: Date.now(), text: input, sender: 'user' }];
+      setMessages(updatedMessages);
       setInput("");
+      console.log("messages after", updatedMessages);
+      setIsTyping(true);
+      processMessageToChatGPT(updatedMessages);
     }
   };
 
@@ -31,12 +37,54 @@ const ChatUI = () => {
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-        if (input.trim() !== "") {
-            messages.push({id: messages.length, text: input, sender: 'user'})
-            setInput("");
-          }
+      handleSend();
 
     }
+  } 
+  const systemMessage = { 
+    "role": "system", "content": "Act as if you are my personal therapist and help me improve my mental health."
+  }
+  async function processMessageToChatGPT(chatMessages) { // messages is an array of messages
+    // Format messages for chatGPT API
+    // API is expecting objects in format of { role: "user" or "assistant", "content": "message here"}
+    // So we need to reformat
+    console.log('inside function', chatMessages);
+    let apiMessages = chatMessages.map((messageObject) => {
+      let role = "";
+      if (messageObject.sender === "bot") {
+        role = "assistant";
+      } else {
+        role = "user";
+      }
+      return { role: role, content: messageObject.text}
+    });
+
+    const apiRequestBody = {
+      "model": "gpt-3.5-turbo",
+      "messages": [
+        systemMessage,  // The system message DEFINES the logic of our chatGPT
+        ...apiMessages // The messages from our chat with ChatGPT
+      ]
+    }
+    await fetch("https://api.openai.com/v1/chat/completions", 
+    {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + process.env.REACT_APP_OPENAI,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(apiRequestBody)
+    }).then((data) => {
+      return data.json();
+    }).then((data) => {
+      console.log(data);
+      console.log(data.choices[0].message.content);
+      setMessages([...chatMessages, {
+        text: data.choices[0].message.content,
+        sender: "bot"
+      }]);
+      setIsTyping(false);
+    });
   }
 
   return (
@@ -52,6 +100,7 @@ const ChatUI = () => {
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
+        {isTyping && <Message message={{ id: Date.now(), text: "AI is thinking...", sender: "bot" }} />}
       </Box>
       <Box sx={{ p: 2, backgroundColor: "background.default" }}>
         <Grid container spacing={2}>
