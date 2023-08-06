@@ -1,6 +1,12 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+} from "react";
 // material-ui
 import {
   Button,
@@ -21,6 +27,8 @@ import {
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import axios from "axios"
+// import useAxios from './AuthAxios';
 
 // project import
 import FirebaseSocial from './FirebaseSocial';
@@ -28,6 +36,7 @@ import AnimateButton from 'components/@extended/AnimateButton';
 
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import AuthContext, { useAuth } from './AuthContext';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
@@ -43,21 +52,55 @@ const AuthLogin = () => {
     event.preventDefault();
   };
 
+    const { loginUser } = useContext(AuthContext);
+
   return (
     <>
       <Formik
         initialValues={{
-          email: 'info@codedthemes.com',
-          password: '123456',
+          username: 'Acnologia',
+          password: '123123123',
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+          username: Yup.string().max(255).required('Username is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
-            setStatus({ success: false });
+            // await axios
+            // .post(
+            //   "http://127.0.0.1:8000/accounts/login/",
+            //   {
+            //    username: values.username,
+            //    password: values.password,
+
+            //   },
+            //   { withCredentials: true }
+            // )
+            // .then(function (response) {
+            //   if (response.status === 200) {
+            //     console.log("response " + response);
+            //     fetchUserSession();
+            //     window.location.href = "http://localhost:3000/meditate"
+            //     return response;
+            //   }
+            // })
+            // .catch(function (error) {
+            //   console.log("aids")
+            //   console.log(error);
+            //   return error;
+            // });
+            await auth.loginUser(
+              values,
+              (r) => {
+                console.log(r);
+                navigate("/");
+              },
+              setErrors
+            );
+
+            setStatus({ success: false});
             setSubmitting(false);
           } catch (err) {
             setStatus({ success: false });
@@ -67,25 +110,25 @@ const AuthLogin = () => {
         }}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-          <form noValidate onSubmit={handleSubmit}>
+          <form  onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="email-login">Email Address</InputLabel>
+                  <InputLabel htmlFor="email-login">Email Address/ Username</InputLabel>
                   <OutlinedInput
                     id="email-login"
-                    type="email"
-                    value={values.email}
+                    type="text"
+                    value={values.username}
                     name="email"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Enter email address"
+                    placeholder="Enter email address or username"
                     fullWidth
-                    error={Boolean(touched.email && errors.email)}
+                    error={Boolean(touched.username && errors.username)}
                   />
-                  {touched.email && errors.email && (
+                  {touched.username && errors.username && (
                     <FormHelperText error id="standard-weight-helper-text-email-login">
-                      {errors.email}
+                      {errors.username}
                     </FormHelperText>
                   )}
                 </Stack>
