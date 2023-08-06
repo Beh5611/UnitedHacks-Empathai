@@ -51,6 +51,9 @@ class LoginView(APIView):
             response = {"message": "Login Successful"}
             userdata = UserSerializer(user).data
             request.session['user'] = userdata
+            # if not remember_me:
+            #     print("session expiry set to 0")
+            #     request.session.set_expiry(0)
         
             return Response(data=response, status=status.HTTP_200_OK)
         else:
