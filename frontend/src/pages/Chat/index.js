@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import Cookies from "js-cookie";
 
 const messages = [
   { id: 1, text: "Hi there!", sender: "bot" },
@@ -38,7 +39,10 @@ const ChatUI = () => {
 
     }
   }
-
+  if(!Cookies.get("cookies") ){
+    window.location.href = "http://localhost:3000/login"
+    return 
+  }
   return (
     <Paper
       sx={{

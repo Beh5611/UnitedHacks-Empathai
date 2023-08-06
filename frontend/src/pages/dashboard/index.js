@@ -13,6 +13,7 @@ import {
 import IncomeAreaChart from './IncomeAreaChart';
 import MonthlyBarChart from './MonthlyBarChart';
 import MainCard from 'components/MainCard';
+import Cookies from 'js-cookie';
 
 
 // sales report status
@@ -22,6 +23,10 @@ import MainCard from 'components/MainCard';
 
 const DashboardDefault = () => {
   const [slot, setSlot] = useState('week');
+  if(!Cookies.get("cookies") ){
+    window.location.href = "http://localhost:3000/login"
+    return 
+  }
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
