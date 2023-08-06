@@ -23,7 +23,7 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-
+import Cookies from 'js-cookie';
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -36,7 +36,6 @@ import AnimateButton from 'components/@extended/AnimateButton';
 
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import AuthContext, { useAuth } from './AuthContext';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
@@ -47,12 +46,26 @@ const AuthLogin = () => {
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
+  const navigate = useNavigate()
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
-    const { loginUser } = useContext(AuthContext);
+  const fetchUserSession = async () => {
+    await axios
+      .get("http://127.0.0.1:8000/accounts/session/", { withCredentials: true })
+      .then(async function (response) {
+        console.log("session", response);
+        await setUser(response.data.user);
+        await setAuthTokens(response.data.tokens);
+      })
+      .catch(async function (error) {
+        console.log(error);
+        await setUser(null);
+        await setAuthTokens({});
+      });
+  };
 
   return (
     <>
@@ -68,37 +81,31 @@ const AuthLogin = () => {
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
-            // await axios
-            // .post(
-            //   "http://127.0.0.1:8000/accounts/login/",
-            //   {
-            //    username: values.username,
-            //    password: values.password,
+            await axios
+            .post(
+              "http://127.0.0.1:8000/accounts/login/",
+              {
+               username: values.username,
+               password: values.password,
 
-            //   },
-            //   { withCredentials: true }
-            // )
-            // .then(function (response) {
-            //   if (response.status === 200) {
-            //     console.log("response " + response);
-            //     fetchUserSession();
-            //     window.location.href = "http://localhost:3000/meditate"
-            //     return response;
-            //   }
-            // })
-            // .catch(function (error) {
-            //   console.log("aids")
-            //   console.log(error);
-            //   return error;
-            // });
-            await auth.loginUser(
-              values,
-              (r) => {
-                console.log(r);
-                navigate("/");
               },
-              setErrors
-            );
+              { withCredentials: true }
+            )
+            .then(function (response) {
+              if (response.status === 200) {
+                console.log("response " + response);
+                // fetchUserSession();
+                window.location.href = "http://localhost:3000/meditate"
+                Cookies.set("cookies", values.username, {expires: 1})
+
+                return response;
+              }
+            })
+            .catch(function (error) {
+              console.log("aids")
+              console.log(error);
+              return error;
+            });
 
             setStatus({ success: false});
             setSubmitting(false);
