@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import Cookies from "js-cookie";
 
 const ChatUI = () => {
   const [input, setInput] = React.useState("");
@@ -86,7 +87,10 @@ const ChatUI = () => {
       setIsTyping(false);
     });
   }
-
+  if(!Cookies.get("cookies") ){
+    window.location.href = "http://localhost:3000/login"
+    return 
+  }
   return (
     <Paper
       sx={{
