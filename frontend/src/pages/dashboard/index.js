@@ -41,7 +41,7 @@ const DashboardDefault = () => {
       <Grid item xs={12} md={7} lg={8}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Typography variant="h5">Unique Visitor</Typography>
+            <Typography variant="h5">Mood Improvement Chart </Typography>
           </Grid>
           <Grid item>
             <Stack direction="row" alignItems="center" spacing={0}>
@@ -81,9 +81,9 @@ const DashboardDefault = () => {
           <Box sx={{ p: 3, pb: 0 }}>
             <Stack spacing={2}>
               <Typography variant="h6" color="textSecondary">
-                This Week Statistics
+                Session Tracker
               </Typography>
-              <Typography variant="h3">$7,650</Typography>
+              <Typography variant="h3">Sunday</Typography>
             </Stack>
           </Box>
           <MonthlyBarChart />
